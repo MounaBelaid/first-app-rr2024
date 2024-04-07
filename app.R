@@ -8,18 +8,27 @@ library(bslib)
 # UI
 ui <- fluidPage(
   titlePanel("Penguin Dashboard"),
-  theme = bs_theme(bootswatch = "minty"),  # Set the theme here
+  theme = bs_theme(bootswatch = "minty"), # Set the theme here
   sidebarLayout(
     sidebarPanel(
       checkboxGroupInput("species_filter", "Filter by Species:",
-                         choices = unique(penguins$species), selected = unique(penguins$species))
+        choices = unique(penguins$species), selected = unique(penguins$species)
+      ),
+      div(
+        style = "text-align:left; font-size: 15px",
+        strong("View Code "), a(icon("fab fa-github"), href = "https://github.com/MounaBelaid/first-app-rr2024", target = "_blank")
+      )
     ),
     mainPanel(
       tabsetPanel(
-        tabPanel("Dashboard",
-                 plotOutput("penguin_plot")),
-        tabPanel("Summary",
-                 dataTableOutput("penguin_table"))
+        tabPanel(
+          "Dashboard",
+          plotOutput("penguin_plot")
+        ),
+        tabPanel(
+          "Summary",
+          dataTableOutput("penguin_table")
+        )
       )
     )
   )
@@ -37,14 +46,15 @@ server <- function(input, output) {
       filter(penguins, species %in% input$species_filter)
     }
   })
-  
+
   # Render penguin distribution plot
   output$penguin_plot <- renderPlot({
     ggplot(filtered_data(), aes(x = species, fill = island)) +
       geom_bar(position = "dodge") +
-      labs(title = "Penguin Distribution by Species and Island") + theme_bw()
+      labs(title = "Penguin Distribution by Species and Island") +
+      theme_bw()
   })
-  
+
   # Render penguin summary table based on filter
   output$penguin_table <- renderDataTable({
     datatable(filtered_data(), options = list(pageLength = 10))
